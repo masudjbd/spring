@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+          http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+          http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-4.0.xsd
+          http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+">
+
+    <bean id="studentService" class="cs544.exercise17_2.StudentService" >
+        <property name="studentdao" ref="studentdao"/>
+        <property name="sf" ref="sessionFactory"/>
+    </bean>
+    <bean id="studentdao" class="cs544.exercise17_2.StudentDAO" autowire="byType"/>
+   
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+       <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost/cs544"/>
+         <property name="username" value="root"/>
+        <property name="password" value=""/>  
+    </bean>
+     
+   <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+       <property name="dataSource" ref="dataSource"/>
+        <property name="hibernateProperties" ref="hibernateProperties"/>
+<!--         <property name="packagesToScan" value="cs544.exercise17_2.*"/>-->
+         <property name="annotatedClasses"> 
+             <list>
+                 <value>cs544.exercise17_2.Student</value>
+                  <value>cs544.exercise17_2.Course</value>
+                              
+             </list>
+         </property>
+    </bean>
+    
+       
+    <bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="hibernate.hbm2ddl.auto">create</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="connection.pool.size">1</prop>
+                <prop key="hibernate.show_sql">true</prop>
+<!--                <prop key="hibernate.current_session_context_class">thread</prop>-->
+                
+            </props>
+        </property>
+            
+    </bean>
+    <tx:annotation-driven transaction-manager="txManager"/>
+    <bean id="txManager" 
+          class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+</beans>
